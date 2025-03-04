@@ -1,12 +1,14 @@
 import React from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { FiUser, FiMail, FiCreditCard, FiBriefcase } from 'react-icons/fi'
+import TituloPagina from '../UI/TituloPagina'
 
 const Perfil: React.FC = () => {
   const { usuario } = useAuth()
 
   return (
     <div>
+      <TituloPagina titulo="Mi Perfil" />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mi Perfil</h1>
         <p className="text-gray-500 dark:text-gray-400">

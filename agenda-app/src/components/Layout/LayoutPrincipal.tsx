@@ -9,10 +9,12 @@ import {
 import Logo from '../UI/Logo'
 import NavItem from '../UI/NavItem'
 import NavCategory from '../UI/NavCategory'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
+import TituloPagina from '../UI/TituloPagina'
 
 const LayoutPrincipal: React.FC = () => {
   const { usuario, logout } = useAuth()
+  const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
     // Verificar preferencia guardada para la sidebar colapsada
@@ -33,6 +35,12 @@ const LayoutPrincipal: React.FC = () => {
   })
   
   const [seccionActiva, setSeccionActiva] = useState<'dashboard' | 'actividades' | 'actividades-diarias' | 'proyectos' | 'informes' | 'funcionarios' | 'asignaciones' | 'perfil' | 'configuracion' | 'estadisticas'>('dashboard')
+
+  // Actualizar la sección activa basada en la ruta actual
+  useEffect(() => {
+    const path = location.pathname.split('/')[1] || 'dashboard';
+    setSeccionActiva(path as any);
+  }, [location.pathname]);
 
   // Alternar modo oscuro
   const toggleDarkMode = () => {
@@ -232,7 +240,7 @@ const LayoutPrincipal: React.FC = () => {
           <div className="flex justify-center">
             <button
               onClick={handleLogout}
-              className="p-2 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+              className="p-2 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
               aria-label="Cerrar sesión"
             >
               <FiLogOut className="h-6 w-6" />
@@ -245,6 +253,9 @@ const LayoutPrincipal: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
+      {/* Título por defecto para el Layout */}
+      <TituloPagina titulo="Agenda de Actividades" />
+      
       {/* Sidebar para móvil */}
       <div className={`
         md:hidden fixed inset-0 z-40 flex transform transition-transform duration-300 ease-in-out

@@ -7,6 +7,7 @@ import RutaProtegida from './components/Auth/RutaProtegida'
 import Dashboard from './components/Dashboard/Dashboard'
 import LayoutPrincipal from './components/Layout/LayoutPrincipal'
 import Perfil from './components/Perfil/Perfil'
+import ActividadesDiarias from './components/Actividades/ActividadesDiarias'
 
 function App() {
   return (
@@ -22,7 +23,7 @@ function App() {
           <Route element={<LayoutPrincipal />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/actividades-diarias" element={<div className="p-4">Actividades Diarias (En desarrollo)</div>} />
+            <Route path="/actividades-diarias" element={<ActividadesDiarias />} />
             <Route path="/proyectos" element={<div className="p-4">Proyectos (En desarrollo)</div>} />
             <Route path="/funcionarios" element={<div className="p-4">Funcionarios (En desarrollo)</div>} />
             <Route path="/asignaciones" element={<div className="p-4">Asignaciones (En desarrollo)</div>} />

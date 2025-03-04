@@ -4,6 +4,7 @@ import {
   FiPieChart, FiBarChart2, FiClock
 } from 'react-icons/fi'
 import { useAuth } from '../../hooks/useAuth'
+import TituloPagina from '../UI/TituloPagina'
 
 // Componente para tarjetas de resumen
 interface TarjetaResumenProps {
@@ -197,6 +198,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div>
+      <TituloPagina titulo="Dashboard" />
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
         <p className="text-gray-500 dark:text-gray-400">

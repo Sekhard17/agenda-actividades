@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { Link, useNavigate } from 'react-router-dom'
+import TituloPagina from '../UI/TituloPagina'
 
 // Iconos
 import { FiUser, FiLock, FiEye, FiEyeOff, FiLogIn } from 'react-icons/fi'
@@ -58,8 +59,9 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4 sm:px-6 lg:px-8">
+      <TituloPagina titulo="Iniciar Sesión" />
+      <div className="max-w-md w-full space-y-8">
         {/* Logo y título */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary dark:bg-accent text-white mb-4">
