@@ -106,7 +106,7 @@ const LayoutPrincipal: React.FC = () => {
           {sidebarCollapsed ? (
             <button
               onClick={toggleSidebar}
-              className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+              className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-primary-500 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
               aria-label="Expandir sidebar"
             >
               <FiChevronRight className="h-5 w-5" />
@@ -213,26 +213,28 @@ const LayoutPrincipal: React.FC = () => {
         <div className="border-t border-gray-200 dark:border-gray-700 pt-4 pb-4 px-4">
           {!sidebarCollapsed ? (
             <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <div className="flex items-center">
-                <div className="flex-shrink-0">
-                  <div className="h-10 w-10 rounded-full bg-primary-500 dark:bg-primary-600 text-white flex items-center justify-center">
-                    <FiUser className="h-5 w-5" />
+              <div className="flex flex-col">
+                <div className="flex items-center mb-2">
+                  <div className="flex-shrink-0">
+                    <div className="h-10 w-10 rounded-full bg-primary-500 dark:bg-primary-600 text-white flex items-center justify-center">
+                      <FiUser className="h-5 w-5" />
+                    </div>
                   </div>
-                </div>
-                <div className="ml-3 min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                    {usuario?.nombres} {usuario?.appaterno}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
-                    {usuario?.rol}
-                  </p>
+                  <div className="ml-3 min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      {usuario?.nombres} {usuario?.appaterno}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
+                      {usuario?.rol}
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="ml-auto p-1.5 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200 flex-shrink-0"
-                  aria-label="Cerrar sesión"
+                  className="w-full mt-1 py-1.5 px-2 rounded-md bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 transition-colors duration-200 text-sm flex items-center justify-center"
                 >
-                  <FiLogOut className="h-5 w-5" />
+                  <FiLogOut className="h-4 w-4 mr-2" />
+                  <span>Cerrar sesión</span>
                 </button>
               </div>
             </div>
@@ -240,10 +242,10 @@ const LayoutPrincipal: React.FC = () => {
             <div className="flex justify-center">
               <button
                 onClick={handleLogout}
-                className="p-2 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+                className="p-2 rounded-full bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30 focus:outline-none focus:ring-2 focus:ring-red-500 dark:focus:ring-red-400 transition-colors duration-200"
                 aria-label="Cerrar sesión"
               >
-                <FiLogOut className="h-6 w-6" />
+                <FiLogOut className="h-5 w-5" />
               </button>
             </div>
           )}
@@ -325,7 +327,7 @@ const LayoutPrincipal: React.FC = () => {
                   <div className="hidden md:flex md:ml-2 items-center">
                     <button
                       onClick={toggleSidebar}
-                      className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+                      className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-primary-500 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
                       aria-label="Colapsar sidebar"
                     >
                       <FiChevronLeft className="h-5 w-5" />
@@ -339,7 +341,7 @@ const LayoutPrincipal: React.FC = () => {
                 {/* Botón tamaño de fuente */}
                 <button
                   onClick={toggleFontSize}
-                  className="p-2 rounded-full text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-primary-500 dark:text-primary-400 hover:bg-primary-50 dark:hover:bg-primary-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
                   aria-label={largeFont ? "Reducir tamaño de fuente" : "Aumentar tamaño de fuente"}
                 >
                   <FiType className="h-5 w-5" />
@@ -349,7 +351,7 @@ const LayoutPrincipal: React.FC = () => {
                 {/* Botón modo oscuro/claro */}
                 <button
                   onClick={toggleDarkMode}
-                  className="p-2 rounded-full text-gray-400 hover:text-gray-500 dark:hover:text-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+                  className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-amber-500 dark:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/30 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
                   aria-label={darkMode ? "Activar modo claro" : "Activar modo oscuro"}
                 >
                   {darkMode ? <FiSun className="h-5 w-5" /> : <FiMoon className="h-5 w-5" />}
