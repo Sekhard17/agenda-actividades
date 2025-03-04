@@ -97,159 +97,160 @@ const LayoutPrincipal: React.FC = () => {
     await logout()
   }
 
-  // Renderizar el contenido de la sidebar
-  const renderSidebarContent = () => (
-    <>
-      <div className="flex items-center justify-between px-4 py-3">
-        <Logo size={sidebarCollapsed ? "sm" : "md"} showText={!sidebarCollapsed} />
-        <button
-          onClick={toggleSidebar}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 hover:text-primary-500 dark:text-gray-400 dark:hover:text-primary-400 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
-          aria-label={sidebarCollapsed ? "Expandir menú" : "Colapsar menú"}
-        >
+  // Renderizar el contenido del sidebar
+  const renderSidebarContent = () => {
+    return (
+      <>
+        {/* Logo y título */}
+        <div className="flex items-center justify-center px-4 h-14 border-b border-gray-200 dark:border-gray-700">
           {sidebarCollapsed ? (
-            <FiChevronRight className="h-5 w-5" />
+            <button
+              onClick={toggleSidebar}
+              className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+              aria-label="Expandir sidebar"
+            >
+              <FiChevronRight className="h-5 w-5" />
+            </button>
           ) : (
-            <FiChevronLeft className="h-5 w-5" />
-          )}
-        </button>
-      </div>
-
-      <div className="mt-5 flex-1 flex flex-col overflow-y-auto">
-        {/* Dashboard */}
-        <NavItem
-          to="/dashboard"
-          icon={<FiHome className="h-6 w-6" />}
-          label="Dashboard"
-          isCollapsed={sidebarCollapsed}
-          onClick={() => setSeccionActiva('dashboard')}
-          isActive={seccionActiva === 'dashboard'}
-          className="mb-4 mx-3"
-        />
-
-        {/* Categoría: Agenda */}
-        <NavCategory title="Agenda" isCollapsed={sidebarCollapsed}>
-          <NavItem
-            to="/actividades-diarias"
-            icon={<FiCalendar className="h-6 w-6" />}
-            label="Actividades Diarias"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('actividades-diarias')}
-            isActive={seccionActiva === 'actividades-diarias'}
-          />
-          <NavItem
-            to="/proyectos"
-            icon={<FiBriefcase className="h-6 w-6" />}
-            label="Proyectos"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('proyectos')}
-            isActive={seccionActiva === 'proyectos'}
-          />
-        </NavCategory>
-
-        {/* Categoría: Gestión */}
-        <NavCategory title="Gestión" isCollapsed={sidebarCollapsed}>
-          <NavItem
-            to="/funcionarios"
-            icon={<FiUsers className="h-6 w-6" />}
-            label="Funcionarios"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('funcionarios')}
-            isActive={seccionActiva === 'funcionarios'}
-            badge={usuario?.rol === 'supervisor' ? 3 : undefined}
-          />
-          <NavItem
-            to="/asignaciones"
-            icon={<FiCheckSquare className="h-6 w-6" />}
-            label="Asignaciones"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('asignaciones')}
-            isActive={seccionActiva === 'asignaciones'}
-          />
-        </NavCategory>
-
-        {/* Categoría: Reportes */}
-        <NavCategory title="Reportes" isCollapsed={sidebarCollapsed}>
-          <NavItem
-            to="/informes"
-            icon={<FiFileText className="h-6 w-6" />}
-            label="Informes"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('informes')}
-            isActive={seccionActiva === 'informes'}
-          />
-          <NavItem
-            to="/estadisticas"
-            icon={<FiPieChart className="h-6 w-6" />}
-            label="Estadísticas"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('estadisticas')}
-            isActive={seccionActiva === 'estadisticas'}
-          />
-        </NavCategory>
-
-        {/* Categoría: Usuario */}
-        <NavCategory title="Usuario" isCollapsed={sidebarCollapsed}>
-          <NavItem
-            to="/perfil"
-            icon={<FiUser className="h-6 w-6" />}
-            label="Mi Perfil"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('perfil')}
-            isActive={seccionActiva === 'perfil'}
-          />
-          <NavItem
-            to="/configuracion"
-            icon={<FiSettings className="h-6 w-6" />}
-            label="Configuración"
-            isCollapsed={sidebarCollapsed}
-            onClick={() => setSeccionActiva('configuracion')}
-            isActive={seccionActiva === 'configuracion'}
-          />
-        </NavCategory>
-      </div>
-      
-      {/* Perfil de usuario en la parte inferior */}
-      <div className="mt-auto border-t border-gray-200 dark:border-gray-700 pt-4 pb-4 px-4">
-        {!sidebarCollapsed ? (
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
             <div className="flex items-center">
-              <div className="flex-shrink-0">
-                <div className="h-10 w-10 rounded-full bg-primary-500 dark:bg-primary-600 text-white flex items-center justify-center">
-                  <FiUser className="h-5 w-5" />
+              <Logo size="md" showText={true} />
+            </div>
+          )}
+        </div>
+        
+        {/* Navegación */}
+        <div className="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+          {/* Categoría: Agenda */}
+          <NavCategory title="Agenda" isCollapsed={sidebarCollapsed}>
+            <NavItem
+              to="/dashboard"
+              icon={<FiHome className="h-6 w-6" />}
+              label="Dashboard"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('dashboard')}
+              isActive={seccionActiva === 'dashboard'}
+            />
+            <NavItem
+              to="/actividades-diarias"
+              icon={<FiCalendar className="h-6 w-6" />}
+              label="Actividades Diarias"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('actividades-diarias')}
+              isActive={seccionActiva === 'actividades-diarias'}
+            />
+            <NavItem
+              to="/proyectos"
+              icon={<FiBriefcase className="h-6 w-6" />}
+              label="Proyectos"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('proyectos')}
+              isActive={seccionActiva === 'proyectos'}
+            />
+          </NavCategory>
+          
+          {/* Categoría: Gestión */}
+          <NavCategory title="Gestión" isCollapsed={sidebarCollapsed}>
+            <NavItem
+              to="/funcionarios"
+              icon={<FiUsers className="h-6 w-6" />}
+              label="Funcionarios"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('funcionarios')}
+              isActive={seccionActiva === 'funcionarios'}
+            />
+            <NavItem
+              to="/asignaciones"
+              icon={<FiCheckSquare className="h-6 w-6" />}
+              label="Asignaciones"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('asignaciones')}
+              isActive={seccionActiva === 'asignaciones'}
+            />
+          </NavCategory>
+
+          {/* Categoría: Reportes */}
+          <NavCategory title="Reportes" isCollapsed={sidebarCollapsed}>
+            <NavItem
+              to="/informes"
+              icon={<FiFileText className="h-6 w-6" />}
+              label="Informes"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('informes')}
+              isActive={seccionActiva === 'informes'}
+            />
+            <NavItem
+              to="/estadisticas"
+              icon={<FiPieChart className="h-6 w-6" />}
+              label="Estadísticas"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('estadisticas')}
+              isActive={seccionActiva === 'estadisticas'}
+            />
+          </NavCategory>
+
+          {/* Categoría: Usuario */}
+          <NavCategory title="Usuario" isCollapsed={sidebarCollapsed}>
+            <NavItem
+              to="/perfil"
+              icon={<FiUser className="h-6 w-6" />}
+              label="Mi Perfil"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('perfil')}
+              isActive={seccionActiva === 'perfil'}
+            />
+            <NavItem
+              to="/configuracion"
+              icon={<FiSettings className="h-6 w-6" />}
+              label="Configuración"
+              isCollapsed={sidebarCollapsed}
+              onClick={() => setSeccionActiva('configuracion')}
+              isActive={seccionActiva === 'configuracion'}
+            />
+          </NavCategory>
+        </div>
+        
+        {/* Perfil de usuario en la parte inferior */}
+        <div className="border-t border-gray-200 dark:border-gray-700 pt-4 pb-4 px-4">
+          {!sidebarCollapsed ? (
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="h-10 w-10 rounded-full bg-primary-500 dark:bg-primary-600 text-white flex items-center justify-center">
+                    <FiUser className="h-5 w-5" />
+                  </div>
                 </div>
+                <div className="ml-3 min-w-0 flex-1">
+                  <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    {usuario?.nombres} {usuario?.appaterno}
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
+                    {usuario?.rol}
+                  </p>
+                </div>
+                <button
+                  onClick={handleLogout}
+                  className="ml-auto p-1.5 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200 flex-shrink-0"
+                  aria-label="Cerrar sesión"
+                >
+                  <FiLogOut className="h-5 w-5" />
+                </button>
               </div>
-              <div className="ml-3 min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {usuario?.nombres?.split(' ')[0]} {usuario?.appaterno}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
-                  {usuario?.rol}
-                </p>
-              </div>
+            </div>
+          ) : (
+            <div className="flex justify-center">
               <button
                 onClick={handleLogout}
-                className="ml-2 p-1.5 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+                className="p-2 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
                 aria-label="Cerrar sesión"
               >
-                <FiLogOut className="h-5 w-5" />
+                <FiLogOut className="h-6 w-6" />
               </button>
             </div>
-          </div>
-        ) : (
-          <div className="flex justify-center">
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-full text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
-              aria-label="Cerrar sesión"
-            >
-              <FiLogOut className="h-6 w-6" />
-            </button>
-          </div>
-        )}
-      </div>
-    </>
-  )
+          )}
+        </div>
+      </>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">
@@ -287,21 +288,23 @@ const LayoutPrincipal: React.FC = () => {
       
       {/* Sidebar para desktop */}
       <div className={`
-        hidden md:flex md:flex-shrink-0 transition-all duration-300 ease-in-out
-        ${sidebarCollapsed ? 'md:w-16' : 'md:w-64'}
+        hidden md:flex md:flex-shrink-0 transition-all duration-300 ease-in-out relative
+        ${sidebarCollapsed ? 'md:w-16' : 'md:w-72'}
       `}>
-        <div className="flex flex-col w-full border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
-          {renderSidebarContent()}
+        <div className="flex flex-col w-full h-screen border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+          <div className="flex-1 flex flex-col h-full overflow-y-auto">
+            {renderSidebarContent()}
+          </div>
         </div>
       </div>
       
       {/* Contenido principal con header */}
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 flex flex-col h-screen overflow-hidden">
         {/* Barra superior */}
         <header className="bg-white dark:bg-gray-800 shadow-sm z-10 relative">
-          <div className="mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex">
+          <div className="mx-auto px-6">
+            <div className="flex justify-between h-14">
+              <div className="flex items-center">
                 {/* Botón móvil */}
                 <div className="flex-shrink-0 flex items-center">
                   <button 
@@ -312,6 +315,23 @@ const LayoutPrincipal: React.FC = () => {
                     <FiMenu className="block h-6 w-6" />
                   </button>
                 </div>
+                
+                {/* Logo en la navbar cuando sidebar está minimizada */}
+                {sidebarCollapsed ? (
+                  <div className="hidden md:flex md:ml-2 items-center">
+                    <Logo size="sm" showText={true} />
+                  </div>
+                ) : (
+                  <div className="hidden md:flex md:ml-2 items-center">
+                    <button
+                      onClick={toggleSidebar}
+                      className="p-2 rounded-full text-gray-600 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 dark:focus:ring-primary-400 transition-colors duration-200"
+                      aria-label="Colapsar sidebar"
+                    >
+                      <FiChevronLeft className="h-5 w-5" />
+                    </button>
+                  </div>
+                )}
               </div>
               
               {/* Controles de usuario */}
@@ -343,7 +363,7 @@ const LayoutPrincipal: React.FC = () => {
                     </div>
                     <div className="ml-2">
                       <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        {usuario?.nombres?.split(' ')[0]} {usuario?.appaterno}
+                        {usuario?.nombres} {usuario?.appaterno}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400 capitalize">
                         {usuario?.rol}
@@ -366,7 +386,7 @@ const LayoutPrincipal: React.FC = () => {
         </header>
 
         {/* Contenido principal */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-100 dark:bg-gray-900">
+        <main className="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-900 p-6">
           <Outlet />
         </main>
       </div>

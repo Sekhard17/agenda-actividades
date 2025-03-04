@@ -81,7 +81,7 @@ const ActividadesDiarias: React.FC = () => {
   }, 0);
 
   return (
-    <div className="container mx-auto px-4 py-6">
+    <div>
       <TituloPagina titulo="Actividades Diarias" />
       
       {/* Encabezado y controles */}

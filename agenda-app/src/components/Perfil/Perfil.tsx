@@ -7,11 +7,11 @@ const Perfil: React.FC = () => {
   const { usuario } = useAuth()
 
   return (
-    <div>
+    <div className="container mx-auto">
       <TituloPagina titulo="Mi Perfil" />
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mi Perfil</h1>
-        <p className="text-gray-500 dark:text-gray-400">
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Mi Perfil</h1>
+        <p className="text-gray-600 dark:text-gray-300 mt-1">
           Administra tu información personal y configuraciones de cuenta.
         </p>
       </div>
