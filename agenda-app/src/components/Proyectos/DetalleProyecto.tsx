@@ -54,12 +54,12 @@ const DetalleProyecto: React.FC<DetalleProyectoProps> = ({
             descripcion,
             fecha,
             estado,
-            usuario:usuario_id (
+            usuario:id_usuario (
               nombres,
               appaterno
             )
           `)
-          .eq('proyecto_id', proyecto.id)
+          .eq('id_proyecto', proyecto.id)
           .order('fecha', { ascending: false })
           .limit(5);
           
@@ -110,7 +110,7 @@ const DetalleProyecto: React.FC<DetalleProyectoProps> = ({
         const { data: statsData, error: statsError } = await supabase
           .from('actividades')
           .select('estado', { count: 'exact' })
-          .eq('proyecto_id', proyecto.id);
+          .eq('id_proyecto', proyecto.id);
           
         if (statsError) throw statsError;
         

@@ -99,6 +99,8 @@ const LayoutPrincipal: React.FC = () => {
 
   // Renderizar el contenido del sidebar
   const renderSidebarContent = () => {
+    const esSupervisor = usuario?.rol === 'supervisor'
+    
     return (
       <>
         {/* Logo y título */}
@@ -148,28 +150,31 @@ const LayoutPrincipal: React.FC = () => {
             />
           </NavCategory>
           
-          {/* Categoría: Gestión */}
-          <NavCategory title="Gestión" isCollapsed={sidebarCollapsed}>
-            <NavItem
-              to="/funcionarios"
-              icon={<FiUsers className="h-6 w-6" />}
-              label="Funcionarios"
-              isCollapsed={sidebarCollapsed}
-              onClick={() => setSeccionActiva('funcionarios')}
-              isActive={seccionActiva === 'funcionarios'}
-            />
-            <NavItem
-              to="/asignaciones"
-              icon={<FiCheckSquare className="h-6 w-6" />}
-              label="Asignaciones"
-              isCollapsed={sidebarCollapsed}
-              onClick={() => setSeccionActiva('asignaciones')}
-              isActive={seccionActiva === 'asignaciones'}
-            />
-          </NavCategory>
+          {/* Categoría: Gestión - Solo visible para supervisores */}
+          {esSupervisor && (
+            <NavCategory title="Gestión" isCollapsed={sidebarCollapsed}>
+              <NavItem
+                to="/funcionarios"
+                icon={<FiUsers className="h-6 w-6" />}
+                label="Funcionarios"
+                isCollapsed={sidebarCollapsed}
+                onClick={() => setSeccionActiva('funcionarios')}
+                isActive={seccionActiva === 'funcionarios'}
+              />
+              <NavItem
+                to="/asignaciones"
+                icon={<FiCheckSquare className="h-6 w-6" />}
+                label="Asignaciones"
+                isCollapsed={sidebarCollapsed}
+                onClick={() => setSeccionActiva('asignaciones')}
+                isActive={seccionActiva === 'asignaciones'}
+              />
+            </NavCategory>
+          )}
 
           {/* Categoría: Reportes */}
           <NavCategory title="Reportes" isCollapsed={sidebarCollapsed}>
+            {/* Informes - Visible para todos, pero con diferentes permisos */}
             <NavItem
               to="/informes"
               icon={<FiFileText className="h-6 w-6" />}
@@ -178,14 +183,17 @@ const LayoutPrincipal: React.FC = () => {
               onClick={() => setSeccionActiva('informes')}
               isActive={seccionActiva === 'informes'}
             />
-            <NavItem
-              to="/estadisticas"
-              icon={<FiPieChart className="h-6 w-6" />}
-              label="Estadísticas"
-              isCollapsed={sidebarCollapsed}
-              onClick={() => setSeccionActiva('estadisticas')}
-              isActive={seccionActiva === 'estadisticas'}
-            />
+            {/* Estadísticas - Solo visible para supervisores */}
+            {esSupervisor && (
+              <NavItem
+                to="/estadisticas"
+                icon={<FiPieChart className="h-6 w-6" />}
+                label="Estadísticas"
+                isCollapsed={sidebarCollapsed}
+                onClick={() => setSeccionActiva('estadisticas')}
+                isActive={seccionActiva === 'estadisticas'}
+              />
+            )}
           </NavCategory>
 
           {/* Categoría: Usuario */}
@@ -198,14 +206,17 @@ const LayoutPrincipal: React.FC = () => {
               onClick={() => setSeccionActiva('perfil')}
               isActive={seccionActiva === 'perfil'}
             />
-            <NavItem
-              to="/configuracion"
-              icon={<FiSettings className="h-6 w-6" />}
-              label="Configuración"
-              isCollapsed={sidebarCollapsed}
-              onClick={() => setSeccionActiva('configuracion')}
-              isActive={seccionActiva === 'configuracion'}
-            />
+            {/* Configuración - Solo visible para supervisores */}
+            {esSupervisor && (
+              <NavItem
+                to="/configuracion"
+                icon={<FiSettings className="h-6 w-6" />}
+                label="Configuración"
+                isCollapsed={sidebarCollapsed}
+                onClick={() => setSeccionActiva('configuracion')}
+                isActive={seccionActiva === 'configuracion'}
+              />
+            )}
           </NavCategory>
         </div>
         

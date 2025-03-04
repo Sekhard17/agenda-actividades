@@ -11,7 +11,7 @@ export interface Actividad {
   completada: boolean
   proyecto?: string
   prioridad: 'baja' | 'media' | 'alta'
-  usuario_id: string
+  id_usuario: string
   created_at?: string
   updated_at?: string
 }
@@ -38,7 +38,7 @@ export class ActividadesService {
       const { data, error } = await supabase
         .from('actividades')
         .select('*')
-        .eq('usuario_id', usuarioId)
+        .eq('id_usuario', usuarioId)
         .order('fecha', { ascending: false })
         .order('hora_inicio', { ascending: true })
       
@@ -64,7 +64,7 @@ export class ActividadesService {
       const { data, error } = await supabase
         .from('actividades')
         .select('*')
-        .eq('usuario_id', usuarioId)
+        .eq('id_usuario', usuarioId)
         .eq('fecha', fecha)
         .order('hora_inicio', { ascending: true })
       
@@ -96,7 +96,7 @@ export class ActividadesService {
         completada: actividad.completada,
         proyecto: actividad.proyecto,
         prioridad: actividad.prioridad,
-        usuario_id: usuarioId
+        id_usuario: usuarioId
       }
       
       const { data, error } = await supabase
