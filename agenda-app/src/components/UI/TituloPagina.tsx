@@ -21,7 +21,7 @@ const TituloPagina: React.FC<TituloPaginaProps> = ({ titulo }) => {
     };
   }, [titulo]);
   
-  // Este componente no renderiza nada visible
+  // Este componente no renderiza nada visible (actualizacion)
   return null;
 };
 
