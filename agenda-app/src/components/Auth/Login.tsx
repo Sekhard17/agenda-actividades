@@ -185,6 +185,12 @@ const Login: React.FC<LoginProps> = ({ onLoginSuccess }) => {
                 Registrarse como supervisor
               </Link>
             </p>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              ¿Eres funcionario y necesitas una cuenta?{' '}
+              <Link to="/registro-funcionario" className="font-medium text-primary dark:text-accent hover:text-primary/80 dark:hover:text-accent/80">
+                Registrarse como funcionario
+              </Link>
+            </p>
           </div>
         </form>
         

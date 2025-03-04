@@ -122,7 +122,7 @@ export const AuthService = {
     email: string,
     rol: 'funcionario' | 'supervisor' = 'funcionario'
   ) {
-    // Registrar usuario en Auth
+    // Registrar usuario en Auth con emailConfirm=false para evitar verificación
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
@@ -134,7 +134,8 @@ export const AuthService = {
           appaterno,
           apmaterno,
           rol
-        }
+        },
+        emailRedirectTo: window.location.origin + '/login',
       }
     })
     
@@ -161,6 +162,14 @@ export const AuthService = {
         // Si hay error al crear el perfil, intentamos eliminar el usuario auth
         await supabase.auth.admin.deleteUser(data.user.id)
         throw perfilError
+      }
+      
+      // Intentamos iniciar sesión automáticamente para confirmar el usuario
+      try {
+        await this.loginWithRut(rut, password)
+      } catch (loginError) {
+        console.log('Auto-login después del registro falló:', loginError)
+        // No propagamos este error, ya que el registro fue exitoso
       }
     }
     

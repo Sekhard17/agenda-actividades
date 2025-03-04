@@ -3,11 +3,13 @@ import './App.css'
 import { Toaster } from 'sonner'
 import Login from './components/Auth/Login'
 import RegistroSupervisor from './components/Auth/RegistroSupervisor'
+import RegistroFuncionario from './components/Auth/RegistroFuncionario'
 import RutaProtegida from './components/Auth/RutaProtegida'
 import Dashboard from './components/Dashboard/Dashboard'
 import LayoutPrincipal from './components/Layout/LayoutPrincipal'
 import Perfil from './components/Perfil/Perfil'
 import ActividadesDiarias from './components/Actividades/ActividadesDiarias'
+import Proyectos from './components/Proyectos/Proyectos'
 
 function App() {
   return (
@@ -17,6 +19,7 @@ function App() {
         {/* Rutas públicas */}
         <Route path="/login" element={<Login />} />
         <Route path="/registro-supervisor" element={<RegistroSupervisor />} />
+        <Route path="/registro-funcionario" element={<RegistroFuncionario />} />
         
         {/* Rutas protegidas */}
         <Route element={<RutaProtegida />}>
@@ -24,7 +27,7 @@ function App() {
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/actividades-diarias" element={<ActividadesDiarias />} />
-            <Route path="/proyectos" element={<div className="p-4">Proyectos (En desarrollo)</div>} />
+            <Route path="/proyectos" element={<Proyectos />} />
             <Route path="/funcionarios" element={<div className="p-4">Funcionarios (En desarrollo)</div>} />
             <Route path="/asignaciones" element={<div className="p-4">Asignaciones (En desarrollo)</div>} />
             <Route path="/informes" element={<div className="p-4">Informes (En desarrollo)</div>} />
