@@ -5,7 +5,6 @@ import {
 } from 'react-icons/fi';
 import { ProyectoConResponsable } from '../../hooks/useProyectosCRUD';
 import { supabase } from '../../lib/supabase';
-import { format } from 'date-fns';
 
 interface Usuario {
   id: string;
