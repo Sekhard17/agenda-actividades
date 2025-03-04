@@ -27,6 +27,11 @@ CREATE TABLE proyectos (
   id_supervisor UUID REFERENCES usuarios(id),
   id_externo_rex TEXT, -- Para integración con API REX
   activo BOOLEAN DEFAULT TRUE,
+  estado TEXT DEFAULT 'planificado' CHECK (estado IN ('planificado', 'en_progreso', 'completado', 'cancelado')),
+  fecha_inicio DATE,
+  fecha_fin DATE,
+  responsable_id UUID REFERENCES usuarios(id),
+  presupuesto NUMERIC(12,2),
   fecha_creacion TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   fecha_actualizacion TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

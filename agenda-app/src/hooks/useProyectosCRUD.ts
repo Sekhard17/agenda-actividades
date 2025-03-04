@@ -54,7 +54,7 @@ export const useProyectosCRUD = (): UseProyectosCRUDResult => {
         .from('proyectos')
         .select(`
           *,
-          responsable:usuarios(
+          responsable:responsable_id(
             nombres,
             appaterno,
             apmaterno
@@ -94,7 +94,7 @@ export const useProyectosCRUD = (): UseProyectosCRUDResult => {
         .from('proyectos')
         .select(`
           *,
-          responsable:usuarios(
+          responsable:responsable_id(
             nombres,
             appaterno,
             apmaterno
@@ -107,9 +107,9 @@ export const useProyectosCRUD = (): UseProyectosCRUDResult => {
 
       return data;
     } catch (err: any) {
-      console.error(`Error al obtener proyecto con ID ${id}:`, err);
-      toast.error('Error al cargar proyecto', {
-        description: err.message || 'No se pudo obtener la información del proyecto'
+      console.error('Error al obtener proyecto:', err);
+      toast.error('Error al cargar el proyecto', {
+        description: err.message || 'Ocurrió un error al obtener el proyecto'
       });
       return null;
     } finally {
