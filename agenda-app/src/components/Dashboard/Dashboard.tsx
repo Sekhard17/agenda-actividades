@@ -1,10 +1,11 @@
 import React from 'react'
 import { 
   FiCalendar, FiUsers, FiCheckSquare, FiBriefcase, 
-  FiPieChart, FiBarChart2, FiClock
+  FiBarChart2
 } from 'react-icons/fi'
-import { useAuth } from '../../hooks/useAuth'
-import TituloPagina from '../UI/TituloPagina'
+import DistribucionProyectos from '../Graficos/DistribucionProyectos'
+import { useEstadisticasDashboard } from '../../hooks/useEstadisticasDashboard'
+import { useActividadesRecientes } from '../../hooks/useActividadesRecientes'
 
 // Componente para tarjetas de resumen
 interface TarjetaResumenProps {
@@ -61,165 +62,186 @@ const Grafico: React.FC<GraficoProps> = ({ titulo, children }) => {
 
 // Componente para actividades recientes
 interface ActividadRecienteProps {
-  titulo: string
-  fecha: string
-  estado: 'completada' | 'pendiente' | 'en-progreso'
-  tipo: string
+  titulo: string;
+  fecha: string;
+  estado: 'borrador' | 'enviado';
+  tipo: string;
+  nombre_proyecto?: string;
 }
 
 const ActividadReciente: React.FC<ActividadRecienteProps> = ({ 
   titulo, 
   fecha, 
   estado, 
-  tipo 
+  tipo,
+  nombre_proyecto
 }) => {
-  const getEstadoColor = () => {
-    switch (estado) {
-      case 'completada':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300'
-      case 'pendiente':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300'
-      case 'en-progreso':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300'
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-    }
+  // Función para formatear la fecha
+  const formatearFecha = (fechaStr: string) => {
+    const fecha = new Date(fechaStr);
+    return fecha.toLocaleDateString('es-CL', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  // Determinar el color y texto del estado
+  let estadoColor = '';
+  let estadoTexto = '';
+  
+  switch (estado) {
+    case 'enviado':
+      estadoColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+      estadoTexto = 'Enviado';
+      break;
+    case 'borrador':
+      estadoColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+      estadoTexto = 'Borrador';
+      break;
+    default:
+      estadoColor = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
+      estadoTexto = estado;
   }
 
-  const getTipoIcon = () => {
-    switch (tipo) {
-      case 'proyecto':
-        return <FiBriefcase className="h-4 w-4" />
-      case 'actividad':
-        return <FiCalendar className="h-4 w-4" />
-      case 'asignacion':
-        return <FiCheckSquare className="h-4 w-4" />
-      default:
-        return <FiClock className="h-4 w-4" />
-    }
+  // Determinar el color del tipo
+  let tipoColor = '';
+  
+  switch (tipo.toLowerCase()) {
+    case 'reunión':
+    case 'reunion':
+      tipoColor = 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300';
+      break;
+    case 'desarrollo':
+      tipoColor = 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300';
+      break;
+    case 'documentación':
+    case 'documentacion':
+      tipoColor = 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300';
+      break;
+    case 'testing':
+    case 'prueba':
+      tipoColor = 'bg-pink-100 text-pink-800 dark:bg-pink-900 dark:text-pink-300';
+      break;
+    default:
+      tipoColor = 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300';
   }
 
   return (
-    <div className="flex items-center py-3 border-b border-gray-200 dark:border-gray-700 last:border-0">
-      <div className="flex-shrink-0 mr-3">
-        <div className="p-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-          {getTipoIcon()}
+    <div className="mb-4 last:mb-0">
+      <div className="flex items-start">
+        <div className="flex-1">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white">
+              {titulo}
+            </h4>
+            <span className="text-xs text-gray-500 dark:text-gray-400 sm:ml-2">
+              {formatearFecha(fecha)}
+            </span>
+          </div>
+          
+          <div className="flex flex-wrap gap-2 mt-1">
+            <span className={`text-xs px-2 py-1 rounded-full ${estadoColor}`}>
+              {estadoTexto}
+            </span>
+            <span className={`text-xs px-2 py-1 rounded-full ${tipoColor}`}>
+              {tipo}
+            </span>
+            {nombre_proyecto && (
+              <span className="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
+                {nombre_proyecto}
+              </span>
+            )}
+          </div>
         </div>
       </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-          {titulo}
-        </p>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          {fecha}
-        </p>
-      </div>
-      <div>
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getEstadoColor()}`}>
-          {estado === 'completada' ? 'Completada' : 
-           estado === 'pendiente' ? 'Pendiente' : 'En progreso'}
-        </span>
-      </div>
     </div>
-  )
-}
+  );
+};
 
 // Componente principal del Dashboard
 const Dashboard: React.FC = () => {
-  const { usuario } = useAuth()
+  // Obtener datos reales usando los hooks personalizados
+  const { 
+    actividadesRegistradas, 
+    funcionariosActivos, 
+    tareasCompletadas, 
+    proyectosActivos,
+    loading: loadingEstadisticas
+  } = useEstadisticasDashboard();
   
-  // Datos de ejemplo para el dashboard
-  const actividadesRecientes = [
-    { 
-      id: 1, 
-      titulo: 'Informe mensual de actividades', 
-      fecha: '4 mar 2025, 09:30', 
-      estado: 'completada' as const, 
-      tipo: 'actividad' 
-    },
-    { 
-      id: 2, 
-      titulo: 'Reunión con equipo de desarrollo', 
-      fecha: '3 mar 2025, 15:00', 
-      estado: 'completada' as const, 
-      tipo: 'actividad' 
-    },
-    { 
-      id: 3, 
-      titulo: 'Proyecto de modernización de sistemas', 
-      fecha: '5 mar 2025, 10:00', 
-      estado: 'pendiente' as const, 
-      tipo: 'proyecto' 
-    },
-    { 
-      id: 4, 
-      titulo: 'Revisión de código con equipo', 
-      fecha: '4 mar 2025, 14:30', 
-      estado: 'en-progreso' as const, 
-      tipo: 'asignacion' 
-    },
-  ]
+  const { 
+    actividades: actividadesRecientes, 
+    loading: loadingActividades 
+  } = useActividadesRecientes(5);
 
-  // Datos de ejemplo para tarjetas de resumen
+  // Datos para las tarjetas de resumen
   const tarjetasResumen = [
     {
       id: 1,
-      titulo: 'Actividades Hoy',
-      valor: 5,
-      icono: <FiCalendar className="h-6 w-6 text-blue-500" />,
-      color: 'bg-blue-100 dark:bg-blue-900/30',
-      descripcion: '2 pendientes'
+      titulo: 'Actividades Registradas',
+      valor: actividadesRegistradas,
+      icono: <FiCalendar className="h-8 w-8 text-white" />,
+      color: 'bg-blue-500',
+      descripcion: 'Último mes'
     },
     {
       id: 2,
-      titulo: 'Proyectos Activos',
-      valor: 3,
-      icono: <FiBriefcase className="h-6 w-6 text-purple-500" />,
-      color: 'bg-purple-100 dark:bg-purple-900/30',
+      titulo: 'Funcionarios Activos',
+      valor: funcionariosActivos,
+      icono: <FiUsers className="h-8 w-8 text-white" />,
+      color: 'bg-purple-500',
     },
     {
       id: 3,
       titulo: 'Tareas Completadas',
-      valor: 12,
-      icono: <FiCheckSquare className="h-6 w-6 text-green-500" />,
-      color: 'bg-green-100 dark:bg-green-900/30',
-      descripcion: 'Esta semana'
+      valor: tareasCompletadas,
+      icono: <FiCheckSquare className="h-8 w-8 text-white" />,
+      color: 'bg-green-500',
+      descripcion: 'Último mes'
     },
     {
       id: 4,
-      titulo: usuario?.rol === 'supervisor' ? 'Funcionarios' : 'Asignaciones',
-      valor: usuario?.rol === 'supervisor' ? 8 : 4,
-      icono: usuario?.rol === 'supervisor' 
-        ? <FiUsers className="h-6 w-6 text-orange-500" />
-        : <FiCheckSquare className="h-6 w-6 text-orange-500" />,
-      color: 'bg-orange-100 dark:bg-orange-900/30',
-    },
-  ]
+      titulo: 'Proyectos Activos',
+      valor: proyectosActivos,
+      icono: <FiBriefcase className="h-8 w-8 text-white" />,
+      color: 'bg-pink-500',
+    }
+  ];
 
   return (
-    <div>
-      <TituloPagina titulo="Dashboard" />
-      
-      {/* Encabezado */}
+    <div className="w-full">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Dashboard</h1>
-        <p className="text-gray-600 dark:text-gray-300 mt-1">
-          Bienvenido, {usuario?.nombres?.split(' ')[0]}. Aquí tienes un resumen de tus actividades.
+        <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">Dashboard</h1>
+        <p className="text-gray-500 dark:text-gray-400">
+          Bienvenido al panel de control de la Agenda de Actividades
         </p>
       </div>
 
       {/* Tarjetas de resumen */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {tarjetasResumen.map(tarjeta => (
-          <TarjetaResumen 
-            key={tarjeta.id}
-            titulo={tarjeta.titulo}
-            valor={tarjeta.valor}
-            icono={tarjeta.icono}
-            color={tarjeta.color}
-            descripcion={tarjeta.descripcion}
-          />
-        ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+        {loadingEstadisticas ? (
+          // Mostrar esqueletos de carga
+          Array(4).fill(0).map((_, index) => (
+            <div key={index} className="bg-white dark:bg-gray-800 rounded-lg shadow p-5 animate-pulse">
+              <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 mb-4"></div>
+              <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 mb-2"></div>
+              <div className="h-6 w-12 bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+          ))
+        ) : (
+          // Mostrar tarjetas con datos reales
+          tarjetasResumen.map(tarjeta => (
+            <TarjetaResumen
+              key={tarjeta.id}
+              titulo={tarjeta.titulo}
+              valor={tarjeta.valor}
+              icono={tarjeta.icono}
+              color={tarjeta.color}
+              descripcion={tarjeta.descripcion}
+            />
+          ))
+        )}
       </div>
 
       {/* Gráficos y estadísticas */}
@@ -235,16 +257,7 @@ const Dashboard: React.FC = () => {
           </div>
         </Grafico>
         
-        <Grafico titulo="Distribución de Proyectos">
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <FiPieChart className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600" />
-              <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                Las estadísticas de proyectos estarán disponibles próximamente
-              </p>
-            </div>
-          </div>
-        </Grafico>
+        <DistribucionProyectos />
       </div>
 
       {/* Actividades recientes y progreso */}
@@ -252,15 +265,32 @@ const Dashboard: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-5">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Actividades Recientes</h3>
           <div>
-            {actividadesRecientes.map(actividad => (
-              <ActividadReciente 
-                key={actividad.id}
-                titulo={actividad.titulo}
-                fecha={actividad.fecha}
-                estado={actividad.estado}
-                tipo={actividad.tipo}
-              />
-            ))}
+            {loadingActividades ? (
+              // Mostrar esqueletos de carga
+              Array(3).fill(0).map((_, index) => (
+                <div key={index} className="mb-4 animate-pulse">
+                  <div className="h-4 w-3/4 bg-gray-200 dark:bg-gray-700 mb-2"></div>
+                  <div className="h-3 w-1/4 bg-gray-200 dark:bg-gray-700 mb-2"></div>
+                  <div className="flex gap-2">
+                    <div className="h-6 w-16 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                    <div className="h-6 w-16 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+                  </div>
+                </div>
+              ))
+            ) : actividadesRecientes.length === 0 ? (
+              <p className="text-gray-500 dark:text-gray-400">No hay actividades recientes</p>
+            ) : (
+              actividadesRecientes.map(actividad => (
+                <ActividadReciente 
+                  key={actividad.id}
+                  titulo={actividad.titulo}
+                  fecha={actividad.fecha}
+                  estado={actividad.estado}
+                  tipo={actividad.tipo}
+                  nombre_proyecto={actividad.nombre_proyecto}
+                />
+              ))
+            )}
           </div>
           <div className="mt-4">
             <button className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
@@ -300,15 +330,10 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
           </div>
-          <div className="mt-4">
-            <button className="text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium">
-              Ver todos los proyectos
-            </button>
-          </div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
