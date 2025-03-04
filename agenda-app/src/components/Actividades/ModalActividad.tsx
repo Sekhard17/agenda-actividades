@@ -240,19 +240,33 @@ const ModalActividad: React.FC<ModalActividadProps> = ({
                   <FiBriefcase className="text-blue-500" />
                   <span>Proyecto</span>
                 </label>
-                <select
-                  name="id_proyecto"
-                  value={actividad.id_proyecto || ''}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                >
-                  <option value="">Seleccionar proyecto</option>
-                  {proyectos.map(proyecto => (
-                    <option key={proyecto.id} value={proyecto.id}>
-                      {proyecto.nombre}
-                    </option>
-                  ))}
-                </select>
+                {proyectos.length > 0 ? (
+                  <>
+                    <select
+                      name="id_proyecto"
+                      value={actividad.id_proyecto || ''}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                    >
+                      <option value="">Seleccionar proyecto</option>
+                      {proyectos.map(proyecto => (
+                        <option key={proyecto.id} value={proyecto.id}>
+                          {proyecto.nombre}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                      Solo se muestran los proyectos asignados a ti o donde eres responsable.
+                    </p>
+                  </>
+                ) : (
+                  <div className="p-3 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <p className="text-sm text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
+                      <FiAlertCircle className="text-yellow-500" />
+                      No tienes proyectos asignados. Contacta a tu supervisor para que te asigne a un proyecto.
+                    </p>
+                  </div>
+                )}
               </div>
               
               <div>

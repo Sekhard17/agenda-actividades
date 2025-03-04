@@ -65,23 +65,82 @@ export const useActividadesDiarias = () => {
   useEffect(() => {
     const cargarProyectos = async () => {
       try {
-        const { data, error } = await supabase
+        if (!usuario) return;
+        
+        console.log('Cargando proyectos para usuario:', usuario.id, 'Rol:', usuario.rol);
+        
+        let query = supabase
           .from('proyectos')
           .select('id, nombre')
-          .eq('activo', true)
-          .order('nombre')
+          .eq('activo', true);
         
-        if (error) throw error
+        // Si es funcionario, solo cargar proyectos asignados a él
+        if (usuario.rol === 'funcionario') {
+          // Obtenemos los IDs de proyectos asignados al funcionario a través de asignaciones_tareas
+          const { data: asignaciones, error: errorAsignaciones } = await supabase
+            .from('asignaciones_tareas')
+            .select('id_proyecto')
+            .eq('id_funcionario', usuario.id)
+            .not('id_proyecto', 'is', null);
+          
+          console.log('Asignaciones encontradas:', asignaciones);
+          
+          if (errorAsignaciones) {
+            console.error('Error al obtener asignaciones:', errorAsignaciones);
+            throw errorAsignaciones;
+          }
+          
+          // También obtenemos proyectos donde el funcionario es responsable o supervisor
+          const { data: proyectosResponsable, error: errorProyectos } = await supabase
+            .from('proyectos')
+            .select('id')
+            .or(`id_supervisor.eq.${usuario.id},responsable_id.eq.${usuario.id}`);
+            
+          console.log('Proyectos donde es responsable o supervisor:', proyectosResponsable);
+          
+          if (errorProyectos) {
+            console.error('Error al obtener proyectos responsable:', errorProyectos);
+            throw errorProyectos;
+          }
+          
+          // Combinamos los IDs de proyectos de ambas fuentes
+          const proyectosIds = [
+            ...(asignaciones?.map(a => a.id_proyecto) || []),
+            ...(proyectosResponsable?.map(p => p.id) || [])
+          ].filter(Boolean); // Filtramos valores nulos o undefined
+          
+          console.log('IDs de proyectos combinados:', proyectosIds);
+          
+          if (proyectosIds.length > 0) {
+            // Eliminamos duplicados
+            const uniqueIds = [...new Set(proyectosIds)];
+            console.log('IDs únicos de proyectos:', uniqueIds);
+            query = query.in('id', uniqueIds);
+          } else {
+            // Si no tiene proyectos asignados, mostrar lista vacía
+            console.log('No se encontraron proyectos asignados');
+            setProyectos([]);
+            return;
+          }
+        }
         
-        setProyectos(data || [])
+        const { data, error } = await query.order('nombre');
+        
+        if (error) {
+          console.error('Error al obtener proyectos:', error);
+          throw error;
+        }
+        
+        console.log('Proyectos obtenidos:', data);
+        setProyectos(data || []);
       } catch (error: any) {
-        console.error('Error al cargar proyectos:', error.message)
-        toast.error('Error al cargar proyectos')
+        console.error('Error al cargar proyectos:', error.message);
+        toast.error('Error al cargar proyectos');
       }
-    }
+    };
     
-    cargarProyectos()
-  }, [])
+    cargarProyectos();
+  }, [usuario]);
   
   // Cargar funcionarios (solo para supervisores)
   useEffect(() => {
@@ -164,6 +223,49 @@ export const useActividadesDiarias = () => {
     cargarActividades()
   }, [usuario, fechaSeleccionada, funcionarioSeleccionado, esSupervisor])
   
+  // Verificar si un usuario tiene acceso a un proyecto específico
+  const verificarAccesoProyecto = async (idProyecto: string, idUsuario: string): Promise<boolean> => {
+    try {
+      // Verificar si el usuario es supervisor o responsable del proyecto
+      const { data: proyecto, error: errorProyecto } = await supabase
+        .from('proyectos')
+        .select('id')
+        .eq('id', idProyecto)
+        .or(`id_supervisor.eq.${idUsuario},responsable_id.eq.${idUsuario}`)
+        .single();
+      
+      if (errorProyecto && errorProyecto.code !== 'PGRST116') { // No es error si no encuentra resultados
+        throw errorProyecto;
+      }
+      
+      // Si es supervisor o responsable del proyecto, tiene acceso
+      if (proyecto) {
+        console.log('Usuario tiene acceso como supervisor o responsable');
+        return true;
+      }
+      
+      // Verificar si el usuario tiene asignación al proyecto
+      const { data: asignacion, error: errorAsignacion } = await supabase
+        .from('asignaciones_tareas')
+        .select('id')
+        .eq('id_funcionario', idUsuario)
+        .eq('id_proyecto', idProyecto)
+        .limit(1);
+      
+      if (errorAsignacion) {
+        throw errorAsignacion;
+      }
+      
+      // Si tiene asignación al proyecto, tiene acceso
+      const tieneAcceso = asignacion && asignacion.length > 0;
+      console.log('Usuario tiene acceso por asignación:', tieneAcceso);
+      return tieneAcceso;
+    } catch (error: any) {
+      console.error('Error al verificar acceso a proyecto:', error.message);
+      return false;
+    }
+  };
+
   // Agregar actividad
   const agregarActividad = async (nuevaActividad: Omit<NuevaActividad, 'id_usuario'>) => {
     if (!usuario) return null
@@ -187,6 +289,19 @@ export const useActividadesDiarias = () => {
       if (superposicion) {
         toast.error('La actividad se superpone con otra existente')
         return null
+      }
+      
+      // Si se seleccionó un proyecto, verificar que el usuario tenga acceso
+      if (nuevaActividad.id_proyecto && !esSupervisor) {
+        const tieneAcceso = await verificarAccesoProyecto(
+          nuevaActividad.id_proyecto, 
+          funcionarioSeleccionado && esSupervisor ? funcionarioSeleccionado : usuario.id
+        );
+        
+        if (!tieneAcceso) {
+          toast.error('No tienes acceso a este proyecto');
+          return null;
+        }
       }
       
       const actividadCompleta: NuevaActividad = {
