@@ -5,10 +5,11 @@ import {
 } from 'react-icons/fi';
 import { useProyectosCRUD, ProyectoConResponsable } from '../../hooks/useProyectosCRUD';
 import TituloPagina from '../UI/TituloPagina';
-import FormularioProyecto from './FormularioProyecto';
 import DetalleProyecto from './DetalleProyecto';
+import ModalProyecto from './ModalProyecto';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import ModalConfirmacion from '../UI/ModalConfirmacion';
 
 // Componente para mostrar el estado del proyecto con un icono y color apropiado
 const EstadoProyecto: React.FC<{ estado: string }> = ({ estado }) => {
@@ -66,10 +67,12 @@ const Proyectos: React.FC = () => {
   const [modalFormularioAbierto, setModalFormularioAbierto] = useState(false);
   const [modalDetalleAbierto, setModalDetalleAbierto] = useState(false);
   const [proyectoActual, setProyectoActual] = useState<ProyectoConResponsable | null>(null);
-  const [modoEdicion, setModoEdicion] = useState(false);
+  const [modoEdicion, setModoEdicion] = useState<'crear' | 'editar'>('crear');
   const [busqueda, setBusqueda] = useState('');
   const [filtroEstado, setFiltroEstado] = useState<string>('todos');
   const [mostrarInactivos, setMostrarInactivos] = useState(false);
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const [proyectoAEliminar, setProyectoAEliminar] = useState<{id: string, nombre: string} | null>(null);
   
   // Cargar proyectos al montar el componente
   useEffect(() => {
@@ -90,14 +93,14 @@ const Proyectos: React.FC = () => {
   // Abrir modal para crear nuevo proyecto
   const abrirModalCrear = () => {
     setProyectoActual(null);
-    setModoEdicion(false);
+    setModoEdicion('crear');
     setModalFormularioAbierto(true);
   };
   
   // Abrir modal para editar proyecto
   const abrirModalEditar = (proyecto: ProyectoConResponsable) => {
     setProyectoActual(proyecto);
-    setModoEdicion(true);
+    setModoEdicion('editar');
     setModalFormularioAbierto(true);
   };
   
@@ -112,14 +115,22 @@ const Proyectos: React.FC = () => {
   
   // Confirmar eliminación de proyecto
   const confirmarEliminar = (id: string, nombre: string) => {
-    if (window.confirm(`¿Estás seguro de que deseas eliminar el proyecto "${nombre}"?`)) {
-      eliminarProyecto(id);
-    }
+    setProyectoAEliminar({ id, nombre });
+    setModalEliminar(true);
   };
   
+  // Ejecutar eliminación de proyecto
+  const ejecutarEliminar = async () => {
+    if (proyectoAEliminar) {
+      await eliminarProyecto(proyectoAEliminar.id);
+      setModalEliminar(false);
+      setProyectoAEliminar(null);
+    }
+  };
+
   // Manejar guardado de proyecto (crear o actualizar)
   const handleGuardarProyecto = async (proyecto: ProyectoConResponsable) => {
-    if (modoEdicion && proyecto.id) {
+    if (modoEdicion === 'editar' && proyecto.id) {
       await actualizarProyecto(proyecto.id, proyecto);
     } else {
       await crearProyecto(proyecto);
@@ -335,14 +346,13 @@ const Proyectos: React.FC = () => {
       </div>
       
       {/* Modal de formulario */}
-      {modalFormularioAbierto && (
-        <FormularioProyecto
-          proyecto={proyectoActual}
-          esEdicion={modoEdicion}
-          onGuardar={handleGuardarProyecto}
-          onCancelar={() => setModalFormularioAbierto(false)}
-        />
-      )}
+      <ModalProyecto
+        isOpen={modalFormularioAbierto}
+        onClose={() => setModalFormularioAbierto(false)}
+        onSubmit={handleGuardarProyecto}
+        proyecto={proyectoActual}
+        modo={modoEdicion}
+      />
       
       {/* Modal de detalle */}
       {modalDetalleAbierto && proyectoActual && (
@@ -355,6 +365,18 @@ const Proyectos: React.FC = () => {
           }}
         />
       )}
+      
+      {/* Modal de confirmación para eliminar */}
+      <ModalConfirmacion
+        isOpen={modalEliminar}
+        onClose={() => setModalEliminar(false)}
+        onConfirm={ejecutarEliminar}
+        titulo="Eliminar proyecto"
+        mensaje={`¿Estás seguro de que deseas eliminar el proyecto "${proyectoAEliminar?.nombre}"? Esta acción no se puede deshacer.`}
+        confirmText="Eliminar"
+        cancelText="Cancelar"
+        confirmButtonClass="bg-red-600 hover:bg-red-700"
+      />
     </div>
   );
 };

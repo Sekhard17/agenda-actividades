@@ -4,9 +4,10 @@ import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { toast } from 'sonner';
 import TituloPagina from '../UI/TituloPagina';
-import { useActividadesDiarias } from '../../hooks/useActividadesDiarias';
+import { useActividadesDiarias, NuevaActividad, Actividad } from '../../hooks/useActividadesDiarias';
 import Spinner from '../UI/Spinner';
 import ModalConfirmacion from '../UI/ModalConfirmacion';
+import ModalActividad from './ModalActividad';
 
 const ActividadesDiarias: React.FC = () => {
   const {
@@ -29,7 +30,7 @@ const ActividadesDiarias: React.FC = () => {
 
   // Estados para el modal de nueva actividad
   const [mostrarModal, setMostrarModal] = useState(false);
-  const [nuevaActividad, setNuevaActividad] = useState({
+  const [nuevaActividad, setNuevaActividad] = useState<Omit<NuevaActividad, 'id_usuario'>>({
     fecha: fechaSeleccionada,
     hora_inicio: '09:00',
     hora_fin: '10:00',
@@ -38,6 +39,10 @@ const ActividadesDiarias: React.FC = () => {
     estado: 'borrador' as 'borrador'
   });
 
+  // Estado para edición de actividad
+  const [modoEdicion, setModoEdicion] = useState(false);
+  const [actividadEnEdicion, setActividadEnEdicion] = useState<string | null>(null);
+
   // Estado para modal de confirmación de eliminación
   const [modalEliminar, setModalEliminar] = useState(false);
   const [actividadAEliminar, setActividadAEliminar] = useState<string | null>(null);
@@ -45,32 +50,44 @@ const ActividadesDiarias: React.FC = () => {
   // Estado para modal de confirmación de envío
   const [modalEnviar, setModalEnviar] = useState(false);
 
-  // Manejar cambios en el formulario de nueva actividad
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setNuevaActividad(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  // Manejar envío del formulario de nueva actividad
+  const handleSubmit = async (actividadData: typeof nuevaActividad) => {
+    if (modoEdicion && actividadEnEdicion) {
+      // Editar actividad existente
+      const resultado = await actualizarActividad({
+        id: actividadEnEdicion,
+        hora_inicio: actividadData.hora_inicio,
+        hora_fin: actividadData.hora_fin,
+        id_proyecto: actividadData.id_proyecto,
+        descripcion: actividadData.descripcion
+      });
+      
+      if (resultado) {
+        setModoEdicion(false);
+        setActividadEnEdicion(null);
+      }
+    } else {
+      // Crear nueva actividad
+      const resultado = await agregarActividad(actividadData);
+      
+      if (resultado) {
+        resetearFormulario();
+      }
+    }
   };
 
-  // Manejar envío del formulario de nueva actividad
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    const resultado = await agregarActividad(nuevaActividad);
-    
-    if (resultado) {
-      setMostrarModal(false);
-      setNuevaActividad({
-        fecha: fechaSeleccionada,
-        hora_inicio: '09:00',
-        hora_fin: '10:00',
-        id_proyecto: '',
-        descripcion: '',
-        estado: 'borrador'
-      });
-    }
+  // Resetear formulario
+  const resetearFormulario = () => {
+    setNuevaActividad({
+      fecha: fechaSeleccionada,
+      hora_inicio: '09:00',
+      hora_fin: '10:00',
+      id_proyecto: '',
+      descripcion: '',
+      estado: 'borrador'
+    });
+    setModoEdicion(false);
+    setActividadEnEdicion(null);
   };
 
   // Manejar cambio de estado de actividad
@@ -105,6 +122,27 @@ const ActividadesDiarias: React.FC = () => {
   const confirmarEnviarAgenda = async () => {
     await enviarAgenda();
     setModalEnviar(false);
+  };
+
+  // Iniciar edición de actividad
+  const handleEditar = (actividad: Actividad) => {
+    if (actividad.estado === 'enviado' && !esSupervisor) {
+      toast.error('No puedes modificar una actividad ya enviada');
+      return;
+    }
+    
+    setNuevaActividad({
+      fecha: actividad.fecha,
+      hora_inicio: actividad.hora_inicio,
+      hora_fin: actividad.hora_fin,
+      id_proyecto: actividad.id_proyecto || '',
+      descripcion: actividad.descripcion,
+      estado: 'borrador'
+    });
+    
+    setModoEdicion(true);
+    setActividadEnEdicion(actividad.id);
+    setMostrarModal(true);
   };
 
   // Formatear hora para mostrar
@@ -180,7 +218,10 @@ const ActividadesDiarias: React.FC = () => {
       {/* Botones de acción */}
       <div className="flex flex-wrap gap-3 mb-6">
         <button
-          onClick={() => setMostrarModal(true)}
+          onClick={() => {
+            resetearFormulario();
+            setMostrarModal(true);
+          }}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
         >
           <FiPlus /> Nueva Actividad
@@ -204,7 +245,10 @@ const ActividadesDiarias: React.FC = () => {
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-8 text-center">
           <p className="text-gray-600 dark:text-gray-300 mb-4">No hay actividades registradas para este día</p>
           <button
-            onClick={() => setMostrarModal(true)}
+            onClick={() => {
+              resetearFormulario();
+              setMostrarModal(true);
+            }}
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
           >
             <FiPlus /> Agregar Actividad
@@ -279,6 +323,14 @@ const ActividadesDiarias: React.FC = () => {
                   </button>
                   
                   <button
+                    onClick={() => handleEditar(actividad)}
+                    className="p-1 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                    title="Editar"
+                  >
+                    <FiClock />
+                  </button>
+                  
+                  <button
                     onClick={() => handleEliminar(actividad.id)}
                     disabled={actividad.estado === 'enviado' && !esSupervisor}
                     className={`p-2 rounded-full bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-300 hover:bg-opacity-80 transition-colors ${
@@ -295,102 +347,16 @@ const ActividadesDiarias: React.FC = () => {
         </div>
       )}
       
-      {/* Modal para nueva actividad */}
-      {mostrarModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg w-full max-w-md">
-            <div className="p-6">
-              <h2 className="text-xl font-bold text-gray-800 dark:text-white mb-4">Nueva Actividad</h2>
-              
-              <form onSubmit={handleSubmit}>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 mb-1">Fecha</label>
-                    <input
-                      type="date"
-                      name="fecha"
-                      value={nuevaActividad.fecha}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700 dark:text-gray-300 mb-1">Hora inicio</label>
-                      <input
-                        type="time"
-                        name="hora_inicio"
-                        value={nuevaActividad.hora_inicio}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 dark:text-gray-300 mb-1">Hora fin</label>
-                      <input
-                        type="time"
-                        name="hora_fin"
-                        value={nuevaActividad.hora_fin}
-                        onChange={handleInputChange}
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                        required
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 mb-1">Proyecto</label>
-                    <select
-                      name="id_proyecto"
-                      value={nuevaActividad.id_proyecto || ''}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                    >
-                      <option value="">Seleccionar proyecto</option>
-                      {proyectos.map(proyecto => (
-                        <option key={proyecto.id} value={proyecto.id}>
-                          {proyecto.nombre}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  
-                  <div>
-                    <label className="block text-gray-700 dark:text-gray-300 mb-1">Descripción</label>
-                    <textarea
-                      name="descripcion"
-                      value={nuevaActividad.descripcion}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                      rows={3}
-                      required
-                    ></textarea>
-                  </div>
-                </div>
-                
-                <div className="flex justify-end gap-3 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => setMostrarModal(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="submit"
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
-                  >
-                    Guardar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Modal de nueva actividad */}
+      <ModalActividad
+        isOpen={mostrarModal}
+        onClose={() => setMostrarModal(false)}
+        onSubmit={handleSubmit}
+        actividad={nuevaActividad}
+        proyectos={proyectos}
+        titulo={modoEdicion ? 'Editar Actividad' : 'Nueva Actividad'}
+        modo={modoEdicion ? 'editar' : 'crear'}
+      />
       
       {/* Modal de confirmación para eliminar */}
       <ModalConfirmacion
